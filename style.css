@@ -1,0 +1,569 @@
+/* font setup */
+@font-face {
+    font-family: 'Minecraft';
+    src: url('media/Minecraft.ttf') format('truetype');
+}
+
+/* INV */
+body {
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+    font-family: 'Minecraft', monospace;
+    background-image: url('media/background1.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.minecraft-inventory {
+    background-color: #c6c6c6;
+    padding: 16px;
+    border: 4px solid #373737;
+    box-shadow: inset -4px -4px 0px #555555, inset 4px 4px 0px #ffffff;
+    display: inline-block;
+    position: relative;
+}
+
+/* matrix grid*/
+.top-section {
+    display: grid;
+    grid-template-columns: repeat(9, 72px);
+    grid-template-rows: repeat(4, 72px);
+    width: 648px;
+    height: 288px;
+}
+
+.armor-slots {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    display: flex;
+    flex-direction: column;
+}
+
+/* player preview(C2, 3, 4) */
+.player-preview {
+    grid-column: 2 / span 3; 
+    grid-row: 1 / span 4;
+    background-color: #000000;
+    border: 4px solid #373737;
+    margin-right: 8px; 
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Off-hand/shield C5 */
+.shield-slots {
+    grid-column: 5;
+    grid-row: 4;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 4px;
+}
+
+/* recipie book between c3 and c4 */
+.recipe-book-zone {
+    grid-column: 6 / span 2;
+    grid-row: 4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 4px;
+}
+
+.recipe-book-btn {
+    width: 76px;
+    height: 76px;
+    background-image: url('media/Recipe_book_button.png'); 
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    cursor: pointer;
+    z-index: 101;
+    position: relative;
+}
+
+.recipe-book-btn:hover {
+    background-image: url('media/Recipe_book_button_highlighted.png'); 
+}
+
+/* "Crafting" text*/
+.crafting-title-zone {
+    grid-column: 6 / span 4; 
+    grid-row: 1;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 6px;
+    padding-left: 4px;
+    transform: translateY(-36px); 
+}
+
+.crafting-title {
+    color: #3f3f3f; 
+    font-family: 'Minecraft', monospace;
+    font-size: 36px;
+}
+
+/* Crafting 2x2 Grid c(one aftr shield)*/
+.crafting-grid-zone {
+    grid-column: 6 / span 2;
+    grid-row: 2 / span 2;
+    display: grid;
+    grid-template-columns: repeat(2, 72px);
+    grid-template-rows: repeat(2, 72px);
+    transform: translateY(-36px);
+}
+
+/* crafting arrow */
+.crafting-arrow-zone {
+    grid-column: 8;
+    grid-row: 2 / span 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-36px);
+}
+
+.crafting-arrow {
+    width: 64px; 
+    height: 60px;
+    background-image: url('media/crafting_arrow.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated; 
+    image-rendering: crisp-edges;
+}
+
+/* Output */
+.crafting-output-zone {
+    grid-column: 9;
+    grid-row: 2 / span 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-36px);
+}
+
+/*something something idk*/
+.output-slot {
+    width: 72px !important;
+    height: 72px !important;
+}
+
+
+/*main inv space*/
+.storage-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 72px);
+    grid-template-rows: repeat(3, 72px);
+}
+
+.hotbar-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 72px);
+    grid-template-rows: 72px;
+}
+
+.inventory-gap {
+    height: 16px; 
+}
+
+/*inv slots and hovers*/
+.slot {
+    width: 72px;
+    height: 72px;
+    background-image: url('media/slot.png');
+    background-size: 100% 100%; 
+    background-repeat: no-repeat;
+    image-rendering: pixelated; 
+    image-rendering: crisp-edges;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/*something something idk2*/
+.slot:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('media/slot_highlight_front.png');
+    background-size: 100% 100%; 
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    pointer-events: none;
+    z-index: 5;
+    scale: 1.5;
+}
+
+/* Armour icons*/
+.helmet-slot {
+    background-image: url('media/helmet.png'), url('media/slot.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain, contain;
+}
+
+.chestplate-slot {
+    background-image: url('media/chestplate.png'), url('media/slot.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain, contain;
+}
+
+.leggings-slot {
+    background-image: url('media/leggings.png'), url('media/slot.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain, contain;
+}
+
+.boots-slot {
+    background-image: url('media/boots.png'), url('media/slot.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain, contain;
+}
+
+.shield-slot {
+    background-image: url('media/shield.png'), url('media/slot.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain, contain;
+}
+/* inv end */
+
+.minecraft-inventory.hidden {
+    display: none !important;
+}
+
+/* blur background */
+.inventory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.inventory-overlay.hidden {
+    display: none !important;
+}
+
+/* Book button*/
+.desktop-book-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    
+    width: 64px;
+    height: 64px;
+    
+    background-image: url('media/book.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    cursor: pointer;
+    z-index: 99999; 
+}
+
+/* im starting to give up on the comments ngl */
+.desktop-book-btn:hover {
+    background-image: url('media/enchanted_book.png');
+    
+    width: 72px;
+    height: 72px;
+    bottom: 20px;
+    left: 20px;
+}
+
+.desktop-book-btn:active {
+    width: 60px;
+    height: 60px;
+    bottom: 26px;
+    left: 26px;
+}
+
+/* moving widgets*/
+.widgets-group {
+    position: fixed;
+    top: 50px; 
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    z-index: 10;
+}
+
+.clock-display-box {
+    text-align: center;
+    color: #ffffff;
+    font-family: 'Minecraft', monospace;
+    text-shadow: 4px 4px 0px #3f3f3f;
+}
+
+#clock-time {
+    font-size: 80px; 
+    margin-bottom: 2px;
+    letter-spacing: 2px;
+}
+
+#clock-date {
+    font-size: 32px; 
+    color: #e0e0e0;
+}
+
+
+.widget-search-container {
+    width: 480px; /* todo change this val at some point*/
+    height: 60px;
+    background-image: url('media/search_bar.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 16px;
+}
+
+#search-input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff !important;
+    font-family: 'Minecraft', monospace;
+    font-size: 24px;
+    text-shadow: 2px 2px 0px #3f3f3f;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+#search-input::placeholder {
+    color: #a0a0a0;
+    text-shadow: 2px 2px 0px #202020;
+}
+
+/* settings stuff*/
+
+.recipe-book-zone {
+    position: relative;
+    z-index: 60; 
+}
+
+#settings-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #c6c6c6;
+    z-index: 100;
+    box-sizing: border-box;
+    padding: 16px;
+    overflow-y: auto;
+    box-shadow: inset -4px -4px 0px #555555, inset 4px 4px 0px #ffffff;
+}
+
+#settings-panel.hidden {
+    display: none;
+}
+
+.settings-title {
+    font-size: 32px;
+    margin-bottom: 24px;
+    text-decoration: underline;
+}
+
+.settings-section {
+    background-color: #a0a0a0;
+    padding: 12px;
+    border: 2px solid #373737;
+    margin-bottom: 16px;
+    width: 60%;
+}
+
+.settings-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+}
+
+.settings-section label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.settings-section input, .settings-section select {
+    font-family: 'Minecraft', monospace;
+    background-color: #ffffff;
+    border: 2px solid #373737;
+    padding: 2px 4px;
+    width: 200px;
+}
+
+.settings-section button {
+    font-family: 'Minecraft', monospace;
+    background-color: #c6c6c6;
+    border: 2px solid #ffffff;
+    border-bottom-color: #555555;
+    border-right-color: #555555;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    width: 100%;
+}
+
+.settings-section button:active {
+    border: 2px solid #555555;
+    border-bottom-color: #ffffff;
+    border-right-color: #ffffff;
+}
+
+/* widget variants*/
+.widgets-group.pos-top-left {
+    left: 40px;
+    transform: none;
+    align-items: flex-start;
+}
+.widgets-group.pos-top-left .clock-display-box {
+    text-align: left;
+}
+
+.widgets-group.pos-top-right {
+    left: auto;
+    right: 40px;
+    transform: none;
+    align-items: flex-end;
+}
+.widgets-group.pos-top-right .clock-display-box {
+    text-align: right;
+}
+
+.widgets-group.color-black .clock-display-box {
+    color: #3f3f3f;
+    text-shadow: 3px 3px 0px #a0a0a0;
+}
+.widgets-group.color-black #clock-date {
+    color: #555555;
+}
+.widgets-group.color-black #search-input {
+    color: #3f3f3f;
+    text-shadow: 2px 2px 0px #e0e0e0;
+}
+
+/* more bookmark stuff2*/
+.slot-item {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    z-index: 2;
+    pointer-events: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* dev text stuff */
+.settings-section textarea {
+    font-family: 'Minecraft', monospace;
+    background-color: #ffffff;
+    border: 2px solid #373737;
+    padding: 8px;
+    width: 100%;
+    height: 110px;
+    box-sizing: border-box;
+    resize: none;
+    font-size: 16px;
+    color: #3f3f3f;
+    outline: none;
+}
+
+.settings-section textarea[readonly] {
+    font-family: 'Minecraft', monospace;
+    background-color: #8a8a8a;
+    border: 2px solid #373737;
+    padding: 8px;
+    width: 100%;
+    height: 110px;
+    box-sizing: border-box;
+    resize: none;
+    font-size: 15px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0px #202020;
+    outline: none;
+    cursor: default;
+}
+
+
+.slot-item {
+    image-rendering: auto !important; /* being pixelated rn? idk */
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: center bottom;
+}
+
+.slot:hover .slot-item {
+    transform: scale(1.18) translateY(-2px);
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.4));
+    z-index: 10;
+}
+
+.player-skin {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.textarea-mock {
+    font-family: 'Minecraft', monospace;
+    background-color: #8a8a8a;
+    border: 2px solid #373737;
+    padding: 8px;
+    width: 100%;
+    height: 110px;
+    box-sizing: border-box;
+    font-size: 15px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0px #202020;
+    overflow-y: auto;
+    cursor: default;
+}
+
+.textarea-mock a {
+    color: #55ff55; /* creeper ahh txt */
+    text-decoration: underline;
+}
