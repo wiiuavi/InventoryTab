@@ -4,7 +4,8 @@
 
 
 # setup
-Clone the repo, open chrome, go to settings, On startup, select the option "open specific pages" and remove any entires there alrdy. Then add your path to the index.html of the repo.
+Clone the repo, open chrome, go to settings, On startup, select the option "open specific pages" and remove any entires there alrdy. Then add your path to the index.html of the repo.  
+
 <img width="715" height="521" alt="image" src="https://github.com/user-attachments/assets/3e9c0bc3-573b-40ab-8c81-b59adae4030d" />
 
 # usage
