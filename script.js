@@ -1,3 +1,23 @@
+// -------------------------------------------------------
+// check if extension or cache
+// -------------------------------------------------------
+const isExtension = typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local;
+
+function setStorageItem(key, value) {
+    localStorage.setItem(key, value);
+    if (isExtension) {
+        chrome.storage.local.set({ [key]: value });
+    }
+}
+
+// Unified clear function
+function removeStorageItem(key) {
+    localStorage.removeItem(key);
+    if (isExtension) {
+        chrome.storage.local.remove(key);
+    }
+}
+
 // --------------------------------
 // keyboard shortcuts and nav
 // ------------------------------
@@ -19,7 +39,6 @@ document.addEventListener('keydown', (event) => {
         return;
     }
     
-    // Toggle the inventory overlay layout ('E' or 'Escape')
     if (event.key.toLowerCase() === 'e' || event.key === 'Escape') {
         toggleOverlay();
     }
@@ -34,7 +53,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Toggle overlay via book button click
 document.getElementById('global-book-trigger').addEventListener('click', () => {
     toggleOverlay();
 });
@@ -116,25 +134,60 @@ if (slotSelect) {
 
 // loading from localsto
 function loadSavedData() {
-    const savedSettings = localStorage.getItem('mc_settings');
-    const savedBookmarks = localStorage.getItem('mc_bookmarks');
-    const savedSkin = localStorage.getItem('mc_player_skin');
+    const setupUI = (savedSettings, savedBookmarks, savedSkin) => {
+        if (savedSettings) userSettings = JSON.parse(savedSettings);
+        if (savedBookmarks) userBookmarks = JSON.parse(savedBookmarks);
+        
+        if (savedSkin && playerSkinEl) {
+            playerSkinEl.style.backgroundImage = `url('${savedSkin}')`;
+        }
 
-    if (savedSettings) userSettings = JSON.parse(savedSettings);
-    if (savedBookmarks) userBookmarks = JSON.parse(savedBookmarks);
-    
-    if (savedSkin && playerSkinEl) {
-        playerSkinEl.style.backgroundImage = `url('${savedSkin}')`;
+        applyClockSettings();
+        renderAllBookmarks();
+        updateEnchantDropdown();
+
+        const posSelect = document.getElementById('clock-pos-select');
+        const colorSelect = document.getElementById('clock-color-select');
+        if (posSelect) posSelect.value = userSettings.clockPos;
+        if (colorSelect) colorSelect.value = userSettings.clockColor;
+    };
+
+    if (isExtension) {
+        chrome.storage.local.get(['mc_settings', 'mc_bookmarks', 'mc_player_skin'], (result) => {
+            // migration
+            let settings = result.mc_settings;
+            if (!settings && localStorage.getItem('mc_settings')) {
+                settings = localStorage.getItem('mc_settings');
+                chrome.storage.local.set({ 'mc_settings': settings });
+            } else {
+                settings = settings || localStorage.getItem('mc_settings');
+            }
+
+            let bookmarks = result.mc_bookmarks;
+            if (!bookmarks && localStorage.getItem('mc_bookmarks')) {
+                bookmarks = localStorage.getItem('mc_bookmarks');
+                chrome.storage.local.set({ 'mc_bookmarks': bookmarks });
+            } else {
+                bookmarks = bookmarks || localStorage.getItem('mc_bookmarks');
+            }
+
+            let skin = result.mc_player_skin;
+            if (!skin && localStorage.getItem('mc_player_skin')) {
+                skin = localStorage.getItem('mc_player_skin');
+                chrome.storage.local.set({ 'mc_player_skin': skin });
+            } else {
+                skin = skin || localStorage.getItem('mc_player_skin');
+            }
+
+            setupUI(settings, bookmarks, skin);
+        });
+    } else {
+        setupUI(
+            localStorage.getItem('mc_settings'),
+            localStorage.getItem('mc_bookmarks'),
+            localStorage.getItem('mc_player_skin')
+        );
     }
-
-    applyClockSettings();
-    renderAllBookmarks();
-    updateEnchantDropdown();
-
-    const posSelect = document.getElementById('clock-pos-select');
-    const colorSelect = document.getElementById('clock-color-select');
-    if (posSelect) posSelect.value = userSettings.clockPos;
-    if (colorSelect) colorSelect.value = userSettings.clockColor;
 }
 
 function applyClockSettings() {
@@ -149,7 +202,7 @@ const clockPosSelect = document.getElementById('clock-pos-select');
 if (clockPosSelect) {
     clockPosSelect.addEventListener('change', (e) => {
         userSettings.clockPos = e.target.value;
-        localStorage.setItem('mc_settings', JSON.stringify(userSettings));
+        setStorageItem('mc_settings', JSON.stringify(userSettings));
         applyClockSettings();
     });
 }
@@ -158,7 +211,7 @@ const clockColorSelect = document.getElementById('clock-color-select');
 if (clockColorSelect) {
     clockColorSelect.addEventListener('change', (e) => {
         userSettings.clockColor = e.target.value;
-        localStorage.setItem('mc_settings', JSON.stringify(userSettings));
+        setStorageItem('mc_settings', JSON.stringify(userSettings));
         applyClockSettings();
     });
 }
@@ -210,7 +263,7 @@ if (saveBookmarkBtn) {
         if (!url && !img) {
             if (userBookmarks[slotId]) {
                 delete userBookmarks[slotId];
-                localStorage.setItem('mc_bookmarks', JSON.stringify(userBookmarks));
+                setStorageItem('mc_bookmarks', JSON.stringify(userBookmarks));
                 renderAllBookmarks();
                 updateEnchantDropdown();
             }
@@ -231,7 +284,7 @@ if (saveBookmarkBtn) {
         const isEnchanted = userBookmarks[slotId] ? !!userBookmarks[slotId].enchanted : false;
 
         userBookmarks[slotId] = { url: url || "", img: img || "", enchanted: isEnchanted };
-        localStorage.setItem('mc_bookmarks', JSON.stringify(userBookmarks));
+        setStorageItem('mc_bookmarks', JSON.stringify(userBookmarks));
         renderAllBookmarks();
         updateEnchantDropdown();
         
@@ -247,7 +300,7 @@ if (clearBookmarksBtn) {
     clearBookmarksBtn.addEventListener('click', () => {
         if (confirm("Are you sure you want to clear all your saved bookmarks?")) {
             userBookmarks = {};
-            localStorage.removeItem('mc_bookmarks');
+            removeStorageItem('mc_bookmarks');
             renderAllBookmarks();
             updateEnchantDropdown();
         }
@@ -269,8 +322,8 @@ if (skinUploadBtn && skinUploadInput) {
         const reader = new FileReader();
         reader.onload = function(event) {
             const base64Data = event.target.result;
+            setStorageItem('mc_player_skin', base64Data);
             
-            localStorage.setItem('mc_player_skin', base64Data);
             if (playerSkinEl) {
                 playerSkinEl.style.backgroundImage = `url('${base64Data}')`;
             }
@@ -283,7 +336,7 @@ if (skinUploadBtn && skinUploadInput) {
 
 if (clearSkinBtn) {
     clearSkinBtn.addEventListener('click', () => {
-        localStorage.removeItem('mc_player_skin');
+        removeStorageItem('mc_player_skin');
         if (playerSkinEl) {
             playerSkinEl.style.backgroundImage = '';
         }
@@ -293,7 +346,7 @@ if (clearSkinBtn) {
 }
 
 // -------------------------------------------------------
-// ENCHANTS
+// ENCHANTMENT UTILITIES & SELECTION CONTROLS
 // -------------------------------------------------------
 function updateEnchantDropdown() {
     const select = document.getElementById('enchant-slot-select');
@@ -304,7 +357,6 @@ function updateEnchantDropdown() {
     let itemFound = false;
 
     for (const [slotId, data] of Object.entries(userBookmarks)) {
-
         if (data.img && data.img.includes('favicons?sz=')) {
             continue; 
         }
@@ -344,7 +396,7 @@ if (toggleEnchantBtn) {
                 toggleEnchantBtn.textContent = "Glint Applied!";
             }
 
-            localStorage.setItem('mc_bookmarks', JSON.stringify(userBookmarks));
+            setStorageItem('mc_bookmarks', JSON.stringify(userBookmarks));
             renderAllBookmarks();
         }
 
