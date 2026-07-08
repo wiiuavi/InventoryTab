@@ -1,5 +1,5 @@
 // --------------------------------
-// keyboard shotcuts and nav
+// keyboard shortcuts and nav
 // ------------------------------
 function toggleOverlay() {
     const overlay = document.getElementById('overlay');
@@ -9,15 +9,12 @@ function toggleOverlay() {
     const isOpening = overlay.classList.contains('hidden');
     overlay.classList.toggle('hidden');
 
-    // FIX: If closing the main inventory menu, force-hide settings panel 
-    // so it never defaults open the next time the inventory layout loads.
     if (!isOpening && settingsPanel) {
         settingsPanel.classList.add('hidden');
     }
 }
 
 document.addEventListener('keydown', (event) => {
-    // Prevent shortcuts from firing if typing inside any input fields or textareas
     if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
         return;
     }
@@ -90,6 +87,9 @@ let userBookmarks = {};
 if (recipeBtn && settingsPanel) {
     recipeBtn.addEventListener('click', () => {
         settingsPanel.classList.toggle('hidden');
+        if (!settingsPanel.classList.contains('hidden')) {
+            updateEnchantDropdown();
+        }
     });
 }
 
@@ -129,6 +129,7 @@ function loadSavedData() {
 
     applyClockSettings();
     renderAllBookmarks();
+    updateEnchantDropdown();
 
     const posSelect = document.getElementById('clock-pos-select');
     const colorSelect = document.getElementById('clock-color-select');
@@ -163,7 +164,7 @@ if (clockColorSelect) {
 }
 
 function renderAllBookmarks() {
-    document.querySelectorAll('.slot-item').forEach(img => img.remove());
+    document.querySelectorAll('.slot-item, .glint-overlay').forEach(el => el.remove());
     
     for (const [slotId, data] of Object.entries(userBookmarks)) {
         const slotEl = document.querySelector(`.slot[data-slot="${slotId}"]`);
@@ -172,6 +173,17 @@ function renderAllBookmarks() {
             img.src = data.img;
             img.className = 'slot-item';
             slotEl.appendChild(img);
+
+            if (data.enchanted) {
+                const glint = document.createElement('div');
+                glint.className = 'glint-overlay';
+                
+                let maskUrl = data.img;
+
+                glint.style.maskImage = `url('${maskUrl}')`;
+                glint.style.webkitMaskImage = `url('${maskUrl}')`;
+                slotEl.appendChild(glint);
+            }
         }
     }
 }
@@ -193,14 +205,17 @@ if (saveBookmarkBtn) {
         let url = document.getElementById('bookmark-url').value.trim();
         let img = document.getElementById('bookmark-img').value.trim();
 
+        const originalText = saveBookmarkBtn.textContent;
+
         if (!url && !img) {
             if (userBookmarks[slotId]) {
                 delete userBookmarks[slotId];
                 localStorage.setItem('mc_bookmarks', JSON.stringify(userBookmarks));
                 renderAllBookmarks();
+                updateEnchantDropdown();
             }
             saveBookmarkBtn.textContent = "Slot Cleared!";
-            setTimeout(() => saveBookmarkBtn.textContent = "Save to Slot", 1500);
+            setTimeout(() => saveBookmarkBtn.textContent = originalText, 1500);
             return;
         }
 
@@ -213,9 +228,12 @@ if (saveBookmarkBtn) {
             img = `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(targetUrl)}`;
         }
 
-        userBookmarks[slotId] = { url: url || "", img: img || "" };
+        const isEnchanted = userBookmarks[slotId] ? !!userBookmarks[slotId].enchanted : false;
+
+        userBookmarks[slotId] = { url: url || "", img: img || "", enchanted: isEnchanted };
         localStorage.setItem('mc_bookmarks', JSON.stringify(userBookmarks));
         renderAllBookmarks();
+        updateEnchantDropdown();
         
         document.getElementById('bookmark-url').value = '';
         document.getElementById('bookmark-img').value = '';
@@ -231,6 +249,7 @@ if (clearBookmarksBtn) {
             userBookmarks = {};
             localStorage.removeItem('mc_bookmarks');
             renderAllBookmarks();
+            updateEnchantDropdown();
         }
     });
 }
@@ -273,6 +292,78 @@ if (clearSkinBtn) {
     });
 }
 
+// -------------------------------------------------------
+// ENCHANTS
+// -------------------------------------------------------
+function updateEnchantDropdown() {
+    const select = document.getElementById('enchant-slot-select');
+    if (!select) return;
+
+    const previousSelection = select.value;
+    select.innerHTML = '';
+    let itemFound = false;
+
+    for (const [slotId, data] of Object.entries(userBookmarks)) {
+
+        if (data.img && data.img.includes('favicons?sz=')) {
+            continue; 
+        }
+
+        itemFound = true;
+        const option = document.createElement('option');
+        option.value = slotId;
+        const isHotbar = slotId.startsWith('h');
+        option.textContent = isHotbar ? `Hotbar ${slotId.substring(1)}` : `Slot ${slotId}`;
+        select.appendChild(option);
+    }
+
+    if (!itemFound) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "-- No items available --";
+        select.appendChild(defaultOption);
+    } else if (previousSelection && select.querySelector(`option[value="${previousSelection}"]`)) {
+        select.value = previousSelection;
+    }
+}
+
+const toggleEnchantBtn = document.getElementById('toggle-enchant-btn');
+if (toggleEnchantBtn) {
+    toggleEnchantBtn.addEventListener('click', () => {
+        const select = document.getElementById('enchant-slot-select');
+        if (!select || !select.value) return;
+
+        const targetSlot = select.value;
+
+        if (userBookmarks[targetSlot]) {
+            if (userBookmarks[targetSlot].enchanted) {
+                userBookmarks[targetSlot].enchanted = false;
+                toggleEnchantBtn.textContent = "Glint Removed!";
+            } else {
+                userBookmarks[targetSlot].enchanted = true;
+                toggleEnchantBtn.textContent = "Glint Applied!";
+            }
+
+            localStorage.setItem('mc_bookmarks', JSON.stringify(userBookmarks));
+            renderAllBookmarks();
+        }
+
+        setTimeout(() => {
+            toggleEnchantBtn.textContent = "Toggle Enchant Glint";
+        }, 1500);
+    });
+}
+
+const refreshEnchantBtn = document.getElementById('refresh-enchant-btn');
+if (refreshEnchantBtn) {
+    refreshEnchantBtn.addEventListener('click', () => {
+        updateEnchantDropdown();
+        refreshEnchantBtn.textContent = "List Refreshed!";
+        setTimeout(() => {
+            refreshEnchantBtn.textContent = "Refresh Item List";
+        }, 1500);
+    });
+}
 
 updateClock();
 setInterval(updateClock, 1000);

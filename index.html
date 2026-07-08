@@ -25,6 +25,16 @@
                 <div class="settings-title">Inventory Settings</div>
 
                 <div class="settings-section">
+                    <h3>Enchant Items</h3>
+                    <label for="enchant-slot-select">Select Slot (Auto fetched icons will not work, see notes):</label>
+                    <select id="enchant-slot-select">
+                        <option value=""> No items available </option>
+                    </select>
+                    <button id="toggle-enchant-btn" style="margin-top: 12px;">Toggle Enchant Glint</button>
+                    <button id="refresh-enchant-btn" style="margin-top: 8px;">Refresh Item List</button>
+                </div>
+
+                <div class="settings-section">
                     <h3>Player Model Skin</h3>
                     <input type="file" id="skin-upload-input" accept="image/*" style="display: none;">
                     <button id="skin-upload-btn">Upload Custom Skin</button>
@@ -59,6 +69,7 @@
                     <label>URL Link: <input type="text" id="bookmark-url" placeholder="https://youtube.com"></label>
                     <label>Image URL: <input type="text" id="bookmark-img" placeholder="https://.../icon.png"></label>
                     <button id="save-bookmark-btn">Save to Slot</button>
+                    <button id="refresh-icons-btn" style="margin-top: 8px;">Refresh All Icons</button>
                     <button id="clear-bookmarks-btn" style="margin-top: 8px; color: #ff5555;">Clear All Bookmarks</button>
                 </div>
 
@@ -70,22 +81,30 @@
                         To get a better background, clone the repo, change the image background1.png. 
                         Same with the armour. 
                         Hit E or escape to exit this. 
-                        If you havent alrdy, go to chrome >> startup, open selected tabs on startup >> "path to index.html file of your cloned repo"
+                        If you havent alrdy, go to chrome >> startup, open selected tabs on startup >> "path to index.html file of your cloned repo".  
+                        To get a favicon easily (if you want to enchant) go to the site, right click anywhere to view page source, find {rel="icon"} and find the href link following it.
                     </div>
                 </div>
             </div>
 
             <div class="top-section">
-                
                 <div class="armor-slots">
-                    <div class="slot helmet-slot" data-slot="helmet" title="Helmet"></div>
-                    <div class="slot chestplate-slot" data-slot="chestplate" title="Chestplate"></div>
-                    <div class="slot leggings-slot" data-slot="leggings" title="Leggings"></div>
-                    <div class="slot boots-slot" data-slot="boots" title="Boots"></div>
+                    <div class="slot helmet-slot" data-slot="helmet"></div>
+                    <div class="slot chestplate-slot" data-slot="chestplate"></div>
+                    <div class="slot leggings-slot" data-slot="leggings"></div>
+                    <div class="slot boots-slot" data-slot="boots"></div>
                 </div>
 
-                <div class="player-preview" id="player-zone">
+                <div class="player-preview">
                     <div class="player-skin"></div>
+                </div>
+
+                <div class="shield-slots">
+                    <div class="slot shield-slot" data-slot="shield"></div>
+                </div>
+
+                <div class="recipe-book-zone">
+                    <div class="recipe-book-btn"></div>
                 </div>
 
                 <div class="crafting-title-zone">
@@ -104,17 +123,8 @@
                 </div>
 
                 <div class="crafting-output-zone">
-                    <div class="slot output-slot" data-slot="c-out"></div>
+                    <div class="slot output-slot" data-slot="output"></div>
                 </div>
-
-                <div class="shield-slots">
-                    <div class="slot shield-slot" data-slot="shield" title="Off-hand"></div>
-                </div>
-
-                <div class="recipe-book-zone">
-                    <div class="recipe-book-btn" title="Recipe Book"></div>
-                </div>
-
             </div>
 
             <div class="inventory-gap"></div>
@@ -129,6 +139,7 @@
                 <div class="slot" data-slot="7"></div>
                 <div class="slot" data-slot="8"></div>
                 <div class="slot" data-slot="9"></div>
+
                 <div class="slot" data-slot="10"></div>
                 <div class="slot" data-slot="11"></div>
                 <div class="slot" data-slot="12"></div>
@@ -138,6 +149,7 @@
                 <div class="slot" data-slot="16"></div>
                 <div class="slot" data-slot="17"></div>
                 <div class="slot" data-slot="18"></div>
+
                 <div class="slot" data-slot="19"></div>
                 <div class="slot" data-slot="20"></div>
                 <div class="slot" data-slot="21"></div>
@@ -162,9 +174,9 @@
                 <div class="slot" data-slot="h8"></div>
                 <div class="slot" data-slot="h9"></div>
             </div>
-
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
